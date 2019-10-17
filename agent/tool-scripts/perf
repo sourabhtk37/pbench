@@ -191,14 +191,19 @@ case "$mode" in
 			popd > /dev/null 2>&1
 			# Generate the initial report.
 			$tool_bin $report_opts -i ${tool_output_dir}/perf.data --stdio > ${tool_output_dir}/perf-report.txt 2> ${tool_output_dir}/perf-report.err
-			xz --threads=0 ${tool_output_dir}/perf.data
 			# only postprocess the perf report if the default options are used
+			#create flamegraph if --callgraph option is used
 			if echo $record_opts | grep -E -q -- -g\|--callgraph; then
-				debug_log "$script_name: not going to run perf postprocess script since this report contains a callgraph"
+                perf script -i ${tool_output_dir}/perf.data > ${tool_output_dir}/out.perf
+                /opt/pbench-agent/tool-scripts/stackcollapse-perf.pl ${tool_output_dir}/out.perf > ${tool_output_dir}/out.folded
+                /opt/pbench-agent/tool-scripts/flamegraph.pl ${tool_output_dir}/out.folded > ${tool_output_dir}/test.svg
+                rm ${tool_output_dir}/out.perf
+                rm -f ${tool_output_dir}/out.folded
 			else
 				$script_path/postprocess/$script_name-postprocess ${tool_output_dir}
 			fi
-			xz --threads=0 ${tool_output_dir}/perf-report.txt
+			xz --threads=0 ${tool_output_dir}/perf.data
+            xz --threads=0 ${tool_output_dir}/perf-report.txt
 			# Provide a README file to help users work with perf data locally.
 			cp ${script_path}/${script_name}.README ${tool_output_dir}/README
 			exit_status=0
