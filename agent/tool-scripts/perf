@@ -136,7 +136,7 @@ tool_output_file=$tool_output_dir/$tool.txt
 case "$mode" in
 	install)
 		check_install_rpm $tool_package_name
-        	;;
+		;;
 	start)
 		if ! cat /proc/mounts | grep -q debugfs; then
 			mount -t debugfs none /sys/kernel/debug
@@ -146,7 +146,7 @@ case "$mode" in
 			error_log "$script_name: start -- unable to create directory $tool_output_dir"
 			exit 1
 		fi
-	        echo "$tool_cmd" > $tool_cmd_file
+		echo "$tool_cmd" > $tool_cmd_file
 		# call the tool and background it...
 		$tool_cmd --output=$tool_output_dir/perf.data > "$tool_output_dir/perf-stdout.txt" 2> "$tool_output_dir/perf-stderr.txt" & echo $! > "$tool_pid_file"
 		wait
@@ -194,16 +194,16 @@ case "$mode" in
 			# only postprocess the perf report if the default options are used
 			#create flamegraph if --callgraph option is used
 			if echo $record_opts | grep -E -q -- -g\|--callgraph; then
-                perf script -i ${tool_output_dir}/perf.data > ${tool_output_dir}/out.perf
-                ${pbench_bin}/tool-scripts/stackcollapse-perf.pl ${tool_output_dir}/out.perf > ${tool_output_dir}/out.folded
-                ${pbench_bin}/tool-scripts/flamegraph.pl ${tool_output_dir}/out.folded > ${tool_output_dir}/test.svg
-                rm ${tool_output_dir}/out.perf
-                rm -f ${tool_output_dir}/out.folded
+				perf script -i ${tool_output_dir}/perf.data > ${tool_output_dir}/out.perf
+				${pbench_bin}/tool-scripts/stackcollapse-perf.pl ${tool_output_dir}/out.perf > ${tool_output_dir}/out.folded
+				${pbench_bin}/tool-scripts/flamegraph.pl ${tool_output_dir}/out.folded > ${tool_output_dir}/test.svg
+				rm ${tool_output_dir}/out.perf
+				rm -f ${tool_output_dir}/out.folded
 			else
 				$script_path/postprocess/$script_name-postprocess ${tool_output_dir}
 			fi
 			xz --threads=0 ${tool_output_dir}/perf.data
-            xz --threads=0 ${tool_output_dir}/perf-report.txt
+			xz --threads=0 ${tool_output_dir}/perf-report.txt
 			# Provide a README file to help users work with perf data locally.
 			cp ${script_path}/${script_name}.README ${tool_output_dir}/README
 			exit_status=0
