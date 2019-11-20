@@ -192,13 +192,9 @@ case "$mode" in
 			# Generate the initial report.
 			$tool_bin $report_opts -i ${tool_output_dir}/perf.data --stdio > ${tool_output_dir}/perf-report.txt 2> ${tool_output_dir}/perf-report.err
 			# only postprocess the perf report if the default options are used
-			#create flamegraph if --callgraph option is used
 			if echo $record_opts | grep -E -q -- -g\|--callgraph; then
-                perf script -i ${tool_output_dir}/perf.data > ${tool_output_dir}/out.perf
-                ${pbench_bin}/tool-scripts/stackcollapse-perf.pl ${tool_output_dir}/out.perf > ${tool_output_dir}/out.folded
-                ${pbench_bin}/tool-scripts/flamegraph.pl ${tool_output_dir}/out.folded > ${tool_output_dir}/test.svg
-                rm ${tool_output_dir}/out.perf
-                rm -f ${tool_output_dir}/out.folded
+				# create flamegraph if --callgraph option is used
+				$script_path/postprocess/$script_name-postprocess ${tool_output_dir} callgraph
 			else
 				$script_path/postprocess/$script_name-postprocess ${tool_output_dir}
 			fi
